@@ -22,29 +22,12 @@ description:         Please see the README on Github at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 
-library:
-  source-dirs: src
-  dependencies:
-  - crik-types
-
 executables:
-  crik-cli-exe:
-    main:                Main.hs
-    source-dirs:         app
+  crik:
+    main: Crik/Main.hs
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - crik-cli
-
-tests:
-  crik-cli-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - crik-cli
+    - crik-types
