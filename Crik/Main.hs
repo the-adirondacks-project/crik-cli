@@ -7,7 +7,7 @@ main :: IO ()
 main = do
   print "Hello World"
   manager <- newManager defaultManagerSettings
-  response <- runClientM getAllVideos (mkClientEnv manager (BaseUrl Http "localhost" 8015 ""))
+  response <- runClientM getVideos (mkClientEnv manager (BaseUrl Http "localhost" 8015 ""))
   case response of
     Left error -> print error
     Right videos -> print videos

@@ -35,4 +35,5 @@ executables:
     - crik-types
     - servant-client >= 0.13
     - servant
+    - text >= 1.0 && <= 2.0
     - http-client >= 0.5

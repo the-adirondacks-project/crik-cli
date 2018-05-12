@@ -3,20 +3,72 @@
 
 module Crik.Client
 (
-  getAllVideos
+  getVideo
+, getVideos
+, createVideo
+, updateVideo
+, getFilesForVideo
+, getFile
+, getFiles
+, createFile
+, getLibrary
+, getLibraries
+, createLibrary
+, updateLibrary
+, getNewFilesInLibrary
+, getAllFilesInLibrary
 ) where
 
 import Data.Proxy (Proxy(Proxy))
-import Servant.Client
+import Data.Text (Text)
 import Servant.API
+import Servant.Client
 
-import Crik.API (GetVideos)
-import Crik.Types.Video (Video, VideoId)
+import Crik.API
+import Crik.Types
+import Crik.Types.Video
+import Crik.Types.VideoFile
+import Crik.Types.VideoLibrary
 
-type GetVideoAPI = "api" :> (GetVideos)
+-- Video API
+proxiedVideoAPI :: Proxy VideoAPI
+proxiedVideoAPI = Proxy
 
-getVideos :: Proxy GetVideoAPI
-getVideos = Proxy
+getVideo :: Int -> ClientM (Video VideoId)
+getVideos :: ClientM [Video VideoId]
+createVideo :: (Video NoId) -> ClientM (Video VideoId)
+updateVideo :: Int -> (Video NoId) -> ClientM (Video VideoId)
+getFilesForVideo :: Int -> ClientM [VideoFile VideoFileId]
+( getVideo :<|>
+  getVideos :<|>
+  createVideo :<|>
+  updateVideo :<|>
+  getFilesForVideo) = client proxiedVideoAPI
 
-getAllVideos :: ClientM [Video VideoId]
-getAllVideos = client getVideos
+-- File API
+proxiedFileAPI :: Proxy FileAPI
+proxiedFileAPI = Proxy
+
+getFile :: Int -> ClientM (VideoFile VideoFileId)
+getFiles :: ClientM [VideoFile VideoFileId]
+createFile :: (VideoFile NoId) -> ClientM (VideoFile VideoFileId)
+( getFile :<|>
+  getFiles :<|>
+  createFile) = client proxiedFileAPI
+
+-- Library API
+proxiedLibraryAPI :: Proxy LibraryAPI
+proxiedLibraryAPI = Proxy
+
+getLibrary :: Int -> ClientM (VideoLibrary VideoLibraryId)
+getLibraries :: ClientM [VideoLibrary VideoLibraryId]
+createLibrary :: (VideoLibrary NoId) -> ClientM (VideoLibrary VideoLibraryId)
+updateLibrary :: Int -> (VideoLibrary NoId) -> ClientM (VideoLibrary VideoLibraryId)
+getNewFilesInLibrary :: Int -> ClientM [Text]
+getAllFilesInLibrary :: Int -> ClientM [Text]
+( getLibrary :<|>
+  getLibraries :<|>
+  createLibrary :<|>
+  updateLibrary :<|>
+  getNewFilesInLibrary :<|>
+  getAllFilesInLibrary) = client proxiedLibraryAPI
