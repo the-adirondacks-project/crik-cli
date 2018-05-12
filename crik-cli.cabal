@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 88db6657bc174ae3c6b9db974e220e62dbbbe125b081d2ecd326733bf5628a3f
+-- hash: b77e3075d1fc0e166e39416cc707f8e326e850c0b9c46f5eb6a82ed46bf03d69
 
 name:           crik-cli
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , crik-types
   exposed-modules:
       Lib
   other-modules:
