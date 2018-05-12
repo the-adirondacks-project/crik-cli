@@ -33,7 +33,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - crik-types
-    - servant-client >= 0.13
-    - servant
-    - text >= 1.0 && <= 2.0
     - http-client >= 0.5
+    - optparse-applicative
+    - servant
+    - servant-client >= 0.13
+    - text >= 1.0 && <= 2.0
