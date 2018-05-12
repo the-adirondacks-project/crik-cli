@@ -21,8 +21,8 @@ module Crik.Client
 
 import Data.Proxy (Proxy(Proxy))
 import Data.Text (Text)
-import Servant.API
-import Servant.Client
+import Servant.API ((:<|>)((:<|>)))
+import Servant.Client (ClientM, client)
 
 import Crik.API
 import Crik.Types
