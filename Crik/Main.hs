@@ -6,9 +6,11 @@ import Options.Applicative
 import Servant.Client
 
 import Crik.Client
+import Crik.Types
+import Crik.Types.Video
 
 data Command = Videos VideoCommand | Files | Libraries deriving (Show)
-data VideoCommand = ListVideos deriving (Show)
+data VideoCommand = ListVideos | AddVideo (Video NoId) deriving (Show)
 
 commandParser :: Parser Command
 commandParser =
@@ -20,8 +22,12 @@ commandParser =
 
 videosParser :: Parser VideoCommand
 videosParser = subparser (
-    command "list" (info (pure ListVideos) (progDesc "Lists all videos"))
+    command "list" (info (pure ListVideos) (progDesc "Lists all videos")) <>
+    command "add" (info (AddVideo <$> addVideoParser) (progDesc "Adds a video"))
   ) <|> (pure ListVideos)
+
+addVideoParser :: Parser (Video NoId)
+addVideoParser = (Video NoId) <$> strOption (long "name" <> metavar "NAME" <> help "Name for video")
 
 parser = info (commandParser <**> helper)
   (fullDesc <> progDesc "A program that does things" <> header "program - a thing")
@@ -38,6 +44,7 @@ main = do
 
 handleCommand :: ClientEnv -> Command -> IO ()
 handleCommand environment (Videos ListVideos) = runClientM getVideos environment >>= handleResponse
+handleCommand environment (Videos (AddVideo video)) = runClientM (createVideo video) environment >>= handleResponse
 handleCommand environment Files = runClientM getFiles environment >>= handleResponse
 handleCommand environment Libraries = runClientM getLibraries environment >>= handleResponse
 
