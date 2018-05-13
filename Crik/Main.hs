@@ -13,15 +13,15 @@ data VideoCommand = ListVideos deriving (Show)
 commandParser :: Parser Command
 commandParser =
   subparser (
-    command "videos" (info (videosParser) (progDesc "Foo")) <>
+    command "videos" (info (Videos <$> videosParser) (progDesc "Foo")) <>
     command "files" (info (pure Files) (progDesc "Gets all files")) <>
     command "libraries" (info (pure Libraries) (progDesc "Gets all files"))
   )
 
-videosParser :: Parser Command
+videosParser :: Parser VideoCommand
 videosParser = subparser (
-    command "list" (info (pure (Videos ListVideos)) (progDesc "Lists all videos"))
-  ) <|> (pure (Videos ListVideos))
+    command "list" (info (pure ListVideos) (progDesc "Lists all videos"))
+  ) <|> (pure ListVideos)
 
 parser = info (commandParser <**> helper)
   (fullDesc <> progDesc "A program that does things" <> header "program - a thing")
