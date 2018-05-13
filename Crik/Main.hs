@@ -7,14 +7,21 @@ import Servant.Client
 
 import Crik.Client
 
-data Command = Videos | Files | Libraries deriving (Show)
+data Command = Videos VideoCommand | Files | Libraries deriving (Show)
+data VideoCommand = ListVideos deriving (Show)
 
 commandParser :: Parser Command
-commandParser = subparser (
-    command "videos" (info (pure Videos) (progDesc "Gets all videos")) <>
+commandParser =
+  subparser (
+    command "videos" (info (videosParser) (progDesc "Foo")) <>
     command "files" (info (pure Files) (progDesc "Gets all files")) <>
     command "libraries" (info (pure Libraries) (progDesc "Gets all files"))
   )
+
+videosParser :: Parser Command
+videosParser = subparser (
+    command "list" (info (pure (Videos ListVideos)) (progDesc "Lists all videos"))
+  ) <|> (pure (Videos ListVideos))
 
 parser = info (commandParser <**> helper)
   (fullDesc <> progDesc "A program that does things" <> header "program - a thing")
@@ -30,7 +37,7 @@ main = do
   execParser parser >>= handleCommand apiEnvironment
 
 handleCommand :: ClientEnv -> Command -> IO ()
-handleCommand environment Videos = runClientM getVideos environment >>= handleResponse
+handleCommand environment (Videos ListVideos) = runClientM getVideos environment >>= handleResponse
 handleCommand environment Files = runClientM getFiles environment >>= handleResponse
 handleCommand environment Libraries = runClientM getLibraries environment >>= handleResponse
 
