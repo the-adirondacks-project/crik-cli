@@ -10,7 +10,7 @@ import Crik.Types
 import Crik.Types.Video
 
 data Command = Videos VideoCommand | Files | Libraries deriving (Show)
-data VideoCommand = ListVideos | AddVideo (Video NoId) deriving (Show)
+data VideoCommand = ListVideos | AddVideo (Video (Maybe VideoId)) deriving (Show)
 
 commandParser :: Parser Command
 commandParser =
@@ -26,8 +26,12 @@ videosParser = subparser (
     command "add" (info (AddVideo <$> addVideoParser) (progDesc "Adds a video"))
   ) <|> (pure ListVideos)
 
-addVideoParser :: Parser (Video NoId)
-addVideoParser = (Video NoId) <$> strOption (long "name" <> metavar "NAME" <> help "Name for video")
+addVideoParser :: Parser (Video (Maybe VideoId))
+addVideoParser = Video Nothing <$> strOption (
+    long "name" <>
+    metavar "NAME" <>
+    help "Name for video"
+  )
 
 parser = info (commandParser <**> helper)
   (fullDesc <> progDesc "A program that does things" <> header "program - a thing")

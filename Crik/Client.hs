@@ -36,8 +36,8 @@ proxiedVideoAPI = Proxy
 
 getVideo :: Int -> ClientM (Video VideoId)
 getVideos :: ClientM [Video VideoId]
-createVideo :: (Video NoId) -> ClientM (Video VideoId)
-updateVideo :: Int -> (Video NoId) -> ClientM (Video VideoId)
+createVideo :: Video (Maybe VideoId) -> ClientM (Video VideoId)
+updateVideo :: Int -> (Video (Maybe VideoId)) -> ClientM (Video VideoId)
 getFilesForVideo :: Int -> ClientM [VideoFile VideoFileId]
 ( getVideo :<|>
   getVideos :<|>
