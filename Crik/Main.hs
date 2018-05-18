@@ -8,23 +8,30 @@ import Servant.Client
 import Crik.Client
 import Crik.Types
 import Crik.Types.Video
+import Crik.Types.VideoFile
+import Crik.Types.VideoLibrary
 
-data Command = Videos VideoCommand | Files | Libraries deriving (Show)
-data VideoCommand = ListVideos | AddVideo (Video NoId) deriving (Show)
+data Command =
+  VideoCommand (APISubCommand (Video NoId) VideoId) |
+  FileCommand (APISubCommand (VideoFile NoId) VideoFileId) |
+  LibraryCommand (APISubCommand (VideoLibrary NoId) VideoLibraryId)
+  deriving (Show)
+
+data APISubCommand item id = Get id | GetAll | Create item | Update item deriving (Show)
 
 commandParser :: Parser Command
 commandParser =
   subparser (
-    command "videos" (info (Videos <$> videosParser) (progDesc "Foo")) <>
-    command "files" (info (pure Files) (progDesc "Gets all files")) <>
-    command "libraries" (info (pure Libraries) (progDesc "Gets all files"))
+    command "videos" (info (VideoCommand <$> videosParser) (progDesc "Foo")) <>
+    command "files" (info (pure $ FileCommand GetAll) (progDesc "Gets all files")) <>
+    command "libraries" (info (pure $ LibraryCommand GetAll) (progDesc "Gets all files"))
   )
 
-videosParser :: Parser VideoCommand
+videosParser :: Parser (APISubCommand (Video NoId) VideoId)
 videosParser = subparser (
-    command "list" (info (pure ListVideos) (progDesc "Lists all videos")) <>
-    command "add" (info (AddVideo <$> addVideoParser) (progDesc "Adds a video"))
-  ) <|> (pure ListVideos)
+    command "list" (info (pure GetAll) (progDesc "Lists all videos")) <>
+    command "add" (info (Create <$> addVideoParser) (progDesc "Adds a video"))
+  ) <|> (pure GetAll)
 
 addVideoParser :: Parser (Video NoId)
 addVideoParser = Video NoId <$> strOption (
@@ -47,10 +54,13 @@ main = do
   execParser parser >>= handleCommand apiEnvironment
 
 handleCommand :: ClientEnv -> Command -> IO ()
-handleCommand environment (Videos ListVideos) = runClientM getVideos environment >>= handleResponse
-handleCommand environment (Videos (AddVideo video)) = runClientM (createVideo video) environment >>= handleResponse
-handleCommand environment Files = runClientM getFiles environment >>= handleResponse
-handleCommand environment Libraries = runClientM getLibraries environment >>= handleResponse
+handleCommand environment (VideoCommand GetAll) =
+  runClientM getVideos environment >>= handleResponse
+handleCommand environment (VideoCommand (Create video)) =
+  runClientM (createVideo video) environment >>= handleResponse
+handleCommand environment (FileCommand GetAll) = runClientM getFiles environment >>= handleResponse
+handleCommand environment (LibraryCommand GetAll) =
+  runClientM getLibraries environment >>= handleResponse
 
 handleResponse :: ToJSON a => Either ServantError a -> IO ()
 handleResponse (Left error) = print error
