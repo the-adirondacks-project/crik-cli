@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString.Lazy as BS (putStr)
 import Data.Semigroup ((<>))
@@ -23,16 +25,17 @@ getAPIEnvironment = do
 main :: IO ()
 main = do
   apiEnvironment <- getAPIEnvironment
-  execParser parser >>= handleCommand apiEnvironment
+  execParser parser >>= (flip handleCommand) apiEnvironment
 
-handleCommand :: ClientEnv -> CrudCommand -> IO ()
-handleCommand environment (VideoCommand GetAll) =
-  runClientM getVideos environment >>= handleResponse
-handleCommand environment (VideoCommand (Create video)) =
-  runClientM (createVideo video) environment >>= handleResponse
-handleCommand environment (FileCommand GetAll) = runClientM getFiles environment >>= handleResponse
-handleCommand environment (LibraryCommand GetAll) =
-  runClientM getLibraries environment >>= handleResponse
+run :: ToJSON a => ClientM a -> ClientEnv -> IO ()
+run clientFunction environment = runClientM clientFunction environment >>= handleResponse
+
+handleCommand :: CrudCommand -> ClientEnv -> IO ()
+handleCommand (VideoCommand GetAll) = run getVideos
+handleCommand (VideoCommand (Create video)) = run $ createVideo video
+handleCommand (FileCommand GetAll) = run getFiles
+handleCommand (FileCommand (Create file)) = run $ createFile file
+handleCommand (LibraryCommand GetAll) = run getLibraries
 
 handleResponse :: ToJSON a => Either ServantError a -> IO ()
 handleResponse (Left error) = print error
