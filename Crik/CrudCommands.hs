@@ -43,28 +43,33 @@ crudSubCommandParser typeName addFunction = subparser (
 
 addFileParser :: Parser (VideoFile NoId)
 addFileParser = do
-  videoId <- option auto (
-               long "video" <>
-               metavar "VIDEO ID" <>
-               help "Id for associated video"
-             )
-  url <- option str (
-           long "url" <>
-           metavar "<file-url>" <>
-           help "URL to access this file"
-         )
-  libraryId <- option auto (
-                 long "library" <>
-                 metavar "<library-id>" <>
-                 help "Id for associated video"
-               )
-  storageId <- option str (
-                 long "storage-id" <>
-                 metavar "<storage-id>" <>
-                 help "Id for associated video"
-               )
+  videoId <- option auto $
+    long "video" <>
+    metavar "VIDEO ID" <>
+    help "Id for associated video"
+
+  url <- option str $
+    long "url" <>
+    metavar "<file-url>" <>
+    help "URL to access this file"
+
+  libraryId <- option auto $
+    long "library" <>
+    metavar "<library-id>" <>
+    help "Id for associated video"
+
+  storageId <- option str $
+    long "storage-id" <>
+    metavar "<storage-id>" <>
+    help "Id for associated video"
+
   pure $
-    VideoFile NoId (VideoId videoId) url (VideoLibraryId libraryId) (VideoFileStorageId storageId)
+    VideoFile
+    NoId
+    (VideoId videoId)
+    url
+    (VideoLibraryId libraryId)
+    (VideoFileStorageId storageId)
 
 videosParser :: Parser (CrudSubCommand (Video NoId) VideoId)
 videosParser = subparser (
