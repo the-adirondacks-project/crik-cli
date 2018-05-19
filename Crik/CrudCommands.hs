@@ -28,22 +28,23 @@ crudCommandParser :: Parser CrudCommand
 crudCommandParser =
   subparser (
     command "files" (info
-      (FileCommand <$> crudSubCommandParser "file" addFileParser)
-      (progDesc "Gets all files")
+      (FileCommand <$> crudSubCommandParser "file" "files" addFileParser <**> helper)
+      (progDesc "List, create, update, or delete files")
     ) <>
     command "videos" (info
-      (VideoCommand <$> crudSubCommandParser "video" addVideoParser)
-      (progDesc "Foo")
+      (VideoCommand <$> crudSubCommandParser "video" "videos" addVideoParser <**> helper)
+      (progDesc "List, create, update, or delete videos")
     ) <>
     command "libraries" (info
-      (LibraryCommand <$> crudSubCommandParser "library" addLibraryParser)
-      (progDesc "Gets all libraries"))
+      (LibraryCommand <$> crudSubCommandParser "library" "libraries" addLibraryParser <**> helper)
+      (progDesc "List, create, update, or delete libraries"))
   )
 
-crudSubCommandParser :: String -> (Parser item) -> Parser (CrudSubCommand item id)
-crudSubCommandParser typeName addFunction = subparser (
-    command "list" (info (pure GetAll) (progDesc ("Lists all" ++ typeName))) <>
-    command "add" (info (Create <$> addFunction) (progDesc "Adds a video"))
+crudSubCommandParser :: String -> String -> (Parser item) -> Parser (CrudSubCommand item id)
+crudSubCommandParser typeName typeNamePlural addFunction = subparser
+  (
+    command "list" (info (pure GetAll <**> helper) (progDesc ("Lists all " ++ typeNamePlural))) <>
+    command "add" (info (Create <$> addFunction <**> helper) (progDesc ("Adds a new " ++ typeName)))
   ) <|> (pure GetAll)
 
 addFileParser :: Parser (VideoFile NoId)
