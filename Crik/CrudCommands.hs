@@ -27,10 +27,13 @@ data CrudSubCommand item id = Get id | GetAll | Create item | Update item derivi
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
   subparser (
-    command "videos" (info (VideoCommand <$> videosParser) (progDesc "Foo")) <>
     command "files" (info
       (FileCommand <$> crudSubCommandParser "file" addFileParser)
       (progDesc "Gets all files")
+    ) <>
+    command "videos" (info
+      (VideoCommand <$> crudSubCommandParser "video" addVideoParser)
+      (progDesc "Foo")
     )
     --command "libraries" (info (pure $ LibraryCommand GetAll) (progDesc "Gets all files"))
   )
@@ -71,15 +74,14 @@ addFileParser = do
     (VideoLibraryId libraryId)
     (VideoFileStorageId storageId)
 
-videosParser :: Parser (CrudSubCommand (Video NoId) VideoId)
-videosParser = subparser (
-    command "list" (info (pure GetAll) (progDesc "Lists all videos")) <>
-    command "add" (info (Create <$> addVideoParser) (progDesc "Adds a video"))
-  ) <|> (pure GetAll)
-
 addVideoParser :: Parser (Video NoId)
-addVideoParser = Video NoId <$> strOption (
+addVideoParser = do
+  name <- strOption $
     long "name" <>
     metavar "<name>" <>
     help "Name for video"
-  )
+
+  pure $
+    Video
+    NoId
+    name
