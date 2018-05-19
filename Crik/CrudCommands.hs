@@ -34,8 +34,10 @@ crudCommandParser =
     command "videos" (info
       (VideoCommand <$> crudSubCommandParser "video" addVideoParser)
       (progDesc "Foo")
-    )
-    --command "libraries" (info (pure $ LibraryCommand GetAll) (progDesc "Gets all files"))
+    ) <>
+    command "libraries" (info
+      (LibraryCommand <$> crudSubCommandParser "library" addLibraryParser)
+      (progDesc "Gets all libraries"))
   )
 
 crudSubCommandParser :: String -> (Parser item) -> Parser (CrudSubCommand item id)
@@ -73,6 +75,18 @@ addFileParser = do
     url
     (VideoLibraryId libraryId)
     (VideoFileStorageId storageId)
+
+addLibraryParser :: Parser (VideoLibrary NoId)
+addLibraryParser = do
+  url <- strOption $
+    long "url" <>
+    metavar "<url>" <>
+    help "URL for library"
+
+  pure $
+    VideoLibrary
+    NoId
+    url
 
 addVideoParser :: Parser (Video NoId)
 addVideoParser = do
