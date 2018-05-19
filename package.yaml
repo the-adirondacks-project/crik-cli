@@ -27,6 +27,7 @@ executables:
     main: Crik/Main.hs
     other-modules:
     - Crik.Client
+    - Crik.CrudCommands
     ghc-options:
     - -threaded
     - -rtsopts
