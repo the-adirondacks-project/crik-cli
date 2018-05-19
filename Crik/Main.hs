@@ -35,6 +35,7 @@ handleCommand (VideoCommand GetAll) = run getVideos
 handleCommand (VideoCommand (Create video)) = run $ createVideo video
 handleCommand (FileCommand GetAll) = run getFiles
 handleCommand (FileCommand (Create file)) = run $ createFile file
+handleCommand (FileCommand (Delete id)) = undefined
 handleCommand (LibraryCommand GetAll) = run getLibraries
 handleCommand (LibraryCommand (Create library)) = run $ createLibrary library
 

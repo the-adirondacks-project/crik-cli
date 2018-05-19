@@ -22,29 +22,47 @@ data CrudCommand =
   LibraryCommand (CrudSubCommand (VideoLibrary NoId) VideoLibraryId)
   deriving (Show)
 
-data CrudSubCommand item id = Get id | GetAll | Create item | Update item deriving (Show)
+data CrudSubCommand item id =
+  Get id |
+  GetAll |
+  Create item |
+  Update item |
+  Delete id
+  deriving (Show)
 
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
   subparser (
     command "files" (info
-      (FileCommand <$> crudSubCommandParser "file" "files" addFileParser <**> helper)
+      (FileCommand <$>
+        crudSubCommandParser "file" "files" addFileParser deleteFileParser <**> helper)
       (progDesc "List, create, update, or delete files")
     ) <>
     command "videos" (info
-      (VideoCommand <$> crudSubCommandParser "video" "videos" addVideoParser <**> helper)
+      (VideoCommand <$> crudSubCommandParser "video" "videos" addVideoParser undefined <**> helper)
       (progDesc "List, create, update, or delete videos")
     ) <>
     command "libraries" (info
-      (LibraryCommand <$> crudSubCommandParser "library" "libraries" addLibraryParser <**> helper)
-      (progDesc "List, create, update, or delete libraries"))
+      (LibraryCommand <$>
+        crudSubCommandParser "library" "libraries" addLibraryParser undefined <**> helper)
+      (progDesc "List, create, update, or delete libraries")
+    )
   )
 
-crudSubCommandParser :: String -> String -> (Parser item) -> Parser (CrudSubCommand item id)
-crudSubCommandParser typeName typeNamePlural addFunction = subparser
+crudSubCommandParser ::
+  String ->
+  String ->
+  (Parser item) ->
+  (Parser id) ->
+  Parser (CrudSubCommand item id)
+crudSubCommandParser typeName typeNamePlural addFunction deleteFunction = subparser
   (
     command "list" (info (pure GetAll <**> helper) (progDesc ("Lists all " ++ typeNamePlural))) <>
-    command "add" (info (Create <$> addFunction <**> helper) (progDesc ("Adds a new " ++ typeName)))
+    command "add" (info (Create <$> addFunction <**> helper) (progDesc ("Adds a new " ++ typeName))) <>
+    command "remove" (info
+      (Delete <$> deleteFunction <**> helper)
+      (progDesc $ "Deletes a " ++ typeName)
+    )
   ) <|> (pure GetAll)
 
 addFileParser :: Parser (VideoFile NoId)
@@ -100,3 +118,12 @@ addVideoParser = do
     Video
     NoId
     name
+
+deleteFileParser :: Parser (VideoFileId)
+deleteFileParser = do
+  id <- option auto $
+    long "id" <>
+    metavar "<id>" <>
+    help "Id of file to delete"
+
+  pure (VideoFileId id)
