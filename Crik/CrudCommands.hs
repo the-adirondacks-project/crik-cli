@@ -33,21 +33,25 @@ data CrudSubCommand item id =
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
   subparser (
-    command "files" (info
-      (FileCommand <$>
-        crudSubCommandParser "file" "files" addFileParser deleteFileParser <**> helper)
-      (progDesc "List, create, update, or delete files")
-    ) <>
-    command "videos" (info
-      (VideoCommand <$> crudSubCommandParser "video" "videos" addVideoParser undefined <**> helper)
-      (progDesc "List, create, update, or delete videos")
-    ) <>
-    command "libraries" (info
-      (LibraryCommand <$>
-        crudSubCommandParser "library" "libraries" addLibraryParser undefined <**> helper)
-      (progDesc "List, create, update, or delete libraries")
-    )
+    (crudCommandParserHelper FileCommand "file" "files" addFileParser deleteFileParser) <>
+    (crudCommandParserHelper LibraryCommand "library" "libraries" addLibraryParser undefined) <>
+    (crudCommandParserHelper VideoCommand "video" "videos" addVideoParser undefined)
   )
+  where
+    crudCommandParserHelper ::
+      (CrudSubCommand item id -> CrudCommand) ->
+      String ->
+      String ->
+      (Parser item) ->
+      (Parser id) ->
+      Mod CommandFields CrudCommand
+    crudCommandParserHelper crudCommand typeName typeNamePlural addFunction deleteFunction =
+      command typeNamePlural (info
+        (crudCommand <$>
+          crudSubCommandParser typeName typeNamePlural addFunction deleteFunction <**> helper)
+        (progDesc $ "List, create, update, or delete " ++ typeNamePlural)
+      )
+
 
 crudSubCommandParser ::
   String ->
