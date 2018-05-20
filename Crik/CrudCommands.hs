@@ -52,7 +52,6 @@ crudCommandParser =
         (progDesc $ "List, create, update, or delete " ++ typeNamePlural)
       )
 
-
 crudSubCommandParser ::
   String ->
   String ->
