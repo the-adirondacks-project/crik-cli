@@ -28,6 +28,7 @@ executables:
     other-modules:
     - Crik.Client
     - Crik.CrudCommands
+    - Crik.TH.DeriveWrappedRead
     ghc-options:
     - -threaded
     - -rtsopts
@@ -40,4 +41,5 @@ executables:
     - optparse-applicative
     - servant
     - servant-client >= 0.13
+    - template-haskell >= 2.0 && <= 3.0
     - text >= 1.0 && <= 2.0

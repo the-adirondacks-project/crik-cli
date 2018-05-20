@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Crik.CrudCommands
 (
@@ -11,6 +12,7 @@ module Crik.CrudCommands
 import Data.Semigroup ((<>))
 import Options.Applicative
 
+import Crik.TH.DeriveWrappedRead
 import Crik.Types
 import Crik.Types.Video
 import Crik.Types.VideoFile
@@ -29,6 +31,10 @@ data CrudSubCommand item id =
   Update item |
   Delete id
   deriving (Show)
+
+deriveWrappedRead ''VideoId
+deriveWrappedRead ''VideoFileId
+deriveWrappedRead ''VideoLibraryId
 
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
