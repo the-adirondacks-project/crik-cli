@@ -34,6 +34,7 @@ data CrudSubCommand item id =
 
 deriveWrappedRead ''VideoId
 deriveWrappedRead ''VideoFileId
+deriveWrappedRead ''VideoFileStorageId
 deriveWrappedRead ''VideoLibraryId
 
 crudCommandParser :: Parser CrudCommand
@@ -91,18 +92,12 @@ addFileParser = do
     metavar "<library-id>" <>
     help "Id for associated video"
 
-  storageId <- option str $
+  storageId <- option auto $
     long "storage-id" <>
     metavar "<storage-id>" <>
     help "Id for associated video"
 
-  pure $
-    VideoFile
-    NoId
-    (VideoId videoId)
-    url
-    (VideoLibraryId libraryId)
-    (VideoFileStorageId storageId)
+  pure $ VideoFile NoId videoId url libraryId storageId
 
 addLibraryParser :: Parser (VideoLibrary NoId)
 addLibraryParser = do
@@ -111,10 +106,7 @@ addLibraryParser = do
     metavar "<url>" <>
     help "URL for library"
 
-  pure $
-    VideoLibrary
-    NoId
-    url
+  pure $ VideoLibrary NoId url
 
 addVideoParser :: Parser (Video NoId)
 addVideoParser = do
@@ -123,10 +115,7 @@ addVideoParser = do
     metavar "<name>" <>
     help "Name for video"
 
-  pure $
-    Video
-    NoId
-    name
+  pure $ Video NoId name
 
 deleteFileParser :: Parser (VideoFileId)
 deleteFileParser = do
@@ -135,4 +124,4 @@ deleteFileParser = do
     metavar "<id>" <>
     help "Id of file to delete"
 
-  pure (VideoFileId id)
+  pure id
