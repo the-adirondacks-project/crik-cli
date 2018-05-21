@@ -12,7 +12,7 @@ module Crik.CrudCommands
 import Data.Semigroup ((<>))
 import Options.Applicative
 
-import Crik.TH.DeriveWrappedRead
+import Crik.TH.DeriveWrapped
 import Crik.Types
 import Crik.Types.Video
 import Crik.Types.VideoFile

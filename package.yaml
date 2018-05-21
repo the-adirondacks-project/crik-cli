@@ -28,7 +28,7 @@ executables:
     other-modules:
     - Crik.Client
     - Crik.CrudCommands
-    - Crik.TH.DeriveWrappedRead
+    - Crik.TH.DeriveWrapped
     ghc-options:
     - -threaded
     - -rtsopts

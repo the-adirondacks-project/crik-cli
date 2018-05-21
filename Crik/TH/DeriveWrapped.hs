@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Crik.TH.DeriveWrappedRead
+module Crik.TH.DeriveWrapped
 (
   deriveWrappedRead
 ) where
