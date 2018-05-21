@@ -31,11 +31,19 @@ run :: ToJSON a => ClientM a -> ClientEnv -> IO ()
 run clientFunction environment = runClientM clientFunction environment >>= handleResponse
 
 handleCommand :: CrudCommand -> ClientEnv -> IO ()
+-- Videos
+handleCommand (VideoCommand (Get id)) = run (getVideo id)
 handleCommand (VideoCommand GetAll) = run getVideos
 handleCommand (VideoCommand (Create video)) = run $ createVideo video
+
+-- Files
+handleCommand (FileCommand (Get id)) = run (getFile id)
 handleCommand (FileCommand GetAll) = run getFiles
 handleCommand (FileCommand (Create file)) = run $ createFile file
 handleCommand (FileCommand (Delete id)) = undefined
+
+-- Libraries
+handleCommand (LibraryCommand (Get id)) = run (getLibrary id)
 handleCommand (LibraryCommand GetAll) = run getLibraries
 handleCommand (LibraryCommand (Create library)) = run $ createLibrary library
 

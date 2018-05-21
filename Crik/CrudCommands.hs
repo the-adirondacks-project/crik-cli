@@ -18,24 +18,24 @@ import Crik.Types.Video
 import Crik.Types.VideoFile
 import Crik.Types.VideoLibrary
 
+deriveWrappedRead ''VideoId
+deriveWrappedRead ''VideoFileId
+deriveWrappedRead ''VideoFileStorageId
+deriveWrappedRead ''VideoLibraryId
+
 data CrudCommand =
   VideoCommand (CrudSubCommand (Video NoId) VideoId) |
   FileCommand (CrudSubCommand (VideoFile NoId) VideoFileId) |
   LibraryCommand (CrudSubCommand (VideoLibrary NoId) VideoLibraryId)
   deriving (Show)
 
-data CrudSubCommand item id =
+data (Read id) => CrudSubCommand item id =
   Get id |
   GetAll |
   Create item |
   Update item |
   Delete id
   deriving (Show)
-
-deriveWrappedRead ''VideoId
-deriveWrappedRead ''VideoFileId
-deriveWrappedRead ''VideoFileStorageId
-deriveWrappedRead ''VideoLibraryId
 
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
@@ -45,7 +45,7 @@ crudCommandParser =
     (crudCommandParserHelper VideoCommand "video" "videos" addVideoParser undefined)
   )
   where
-    crudCommandParserHelper ::
+    crudCommandParserHelper :: (Read id) =>
       (CrudSubCommand item id -> CrudCommand) ->
       String ->
       String ->
@@ -59,7 +59,7 @@ crudCommandParser =
         (progDesc $ "List, create, update, or delete " ++ typeNamePlural)
       )
 
-crudSubCommandParser ::
+crudSubCommandParser :: (Read id) =>
   String ->
   String ->
   (Parser item) ->
@@ -73,7 +73,16 @@ crudSubCommandParser typeName typeNamePlural addFunction deleteFunction = subpar
       (Delete <$> deleteFunction <**> helper)
       (progDesc $ "Deletes a " ++ typeName)
     )
-  ) <|> (pure GetAll)
+  ) <|> (Get <$> (getSingleParser typeName <**> helper)) <|> (pure GetAll)
+
+getSingleParser :: (Read id) => String -> Parser (id)
+getSingleParser typeName = do
+  id <- option auto $
+    long "id" <>
+    metavar "<id>" <>
+    help ("Show an individual " ++ typeName)
+
+  pure id
 
 addFileParser :: Parser (VideoFile NoId)
 addFileParser = do

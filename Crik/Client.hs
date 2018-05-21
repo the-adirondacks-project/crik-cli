@@ -23,6 +23,7 @@ import Data.Proxy (Proxy(Proxy))
 import Data.Text (Text)
 import Servant.API ((:<|>)((:<|>)))
 import Servant.Client (ClientM, client)
+import Web.HttpApiData (ToHttpApiData, toUrlPiece, toQueryParam)
 
 import Crik.API
 import Crik.Types
@@ -30,15 +31,27 @@ import Crik.Types.Video
 import Crik.Types.VideoFile
 import Crik.Types.VideoLibrary
 
+instance ToHttpApiData VideoId where
+  toUrlPiece (VideoId id) = toUrlPiece id
+  toQueryParam (VideoId id) = toQueryParam id
+
+instance ToHttpApiData VideoFileId where
+  toUrlPiece (VideoFileId id) = toUrlPiece id
+  toQueryParam (VideoFileId id) = toQueryParam id
+
+instance ToHttpApiData VideoLibraryId where
+  toUrlPiece (VideoLibraryId id) = toUrlPiece id
+  toQueryParam (VideoLibraryId id) = toQueryParam id
+
 -- Video API
 proxiedVideoAPI :: Proxy VideoAPI
 proxiedVideoAPI = Proxy
 
-getVideo :: Int -> ClientM (Video VideoId)
+getVideo :: VideoId -> ClientM (Video VideoId)
 getVideos :: ClientM [Video VideoId]
 createVideo :: Video NoId -> ClientM (Video VideoId)
-updateVideo :: Int -> (Video (Maybe VideoId)) -> ClientM (Video VideoId)
-getFilesForVideo :: Int -> ClientM [VideoFile VideoFileId]
+updateVideo :: VideoId -> (Video (Maybe VideoId)) -> ClientM (Video VideoId)
+getFilesForVideo :: VideoId -> ClientM [VideoFile VideoFileId]
 ( getVideo :<|>
   getVideos :<|>
   createVideo :<|>
@@ -49,7 +62,7 @@ getFilesForVideo :: Int -> ClientM [VideoFile VideoFileId]
 proxiedFileAPI :: Proxy FileAPI
 proxiedFileAPI = Proxy
 
-getFile :: Int -> ClientM (VideoFile VideoFileId)
+getFile :: VideoFileId -> ClientM (VideoFile VideoFileId)
 getFiles :: ClientM [VideoFile VideoFileId]
 createFile :: (VideoFile NoId) -> ClientM (VideoFile VideoFileId)
 ( getFile :<|>
@@ -60,12 +73,12 @@ createFile :: (VideoFile NoId) -> ClientM (VideoFile VideoFileId)
 proxiedLibraryAPI :: Proxy LibraryAPI
 proxiedLibraryAPI = Proxy
 
-getLibrary :: Int -> ClientM (VideoLibrary VideoLibraryId)
+getLibrary :: VideoLibraryId -> ClientM (VideoLibrary VideoLibraryId)
 getLibraries :: ClientM [VideoLibrary VideoLibraryId]
 createLibrary :: (VideoLibrary NoId) -> ClientM (VideoLibrary VideoLibraryId)
-updateLibrary :: Int -> (VideoLibrary NoId) -> ClientM (VideoLibrary VideoLibraryId)
-getNewFilesInLibrary :: Int -> ClientM [Text]
-getAllFilesInLibrary :: Int -> ClientM [Text]
+updateLibrary :: VideoLibraryId -> (VideoLibrary NoId) -> ClientM (VideoLibrary VideoLibraryId)
+getNewFilesInLibrary :: VideoLibraryId -> ClientM [Text]
+getAllFilesInLibrary :: VideoLibraryId -> ClientM [Text]
 ( getLibrary :<|>
   getLibraries :<|>
   createLibrary :<|>
