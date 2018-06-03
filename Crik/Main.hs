@@ -9,10 +9,6 @@ import Servant.Client
 
 import Crik.Client
 import Crik.CrudCommands
-import Crik.Types
-import Crik.Types.Video
-import Crik.Types.VideoFile
-import Crik.Types.VideoLibrary
 
 parser = info (crudCommandParser <**> helper)
   (fullDesc <> progDesc "A program that does things" <> header "program - a thing")

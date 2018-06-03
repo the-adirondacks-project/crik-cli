@@ -15,18 +15,18 @@ import Options.Applicative
 import Crik.TH.DeriveWrapped
 import Crik.Types
 import Crik.Types.Video
-import Crik.Types.VideoFile
-import Crik.Types.VideoLibrary
+import Crik.Types.File
+import Crik.Types.Library
 
 deriveWrappedRead ''VideoId
-deriveWrappedRead ''VideoFileId
-deriveWrappedRead ''VideoFileStorageId
-deriveWrappedRead ''VideoLibraryId
+deriveWrappedRead ''FileId
+deriveWrappedRead ''FileStorageId
+deriveWrappedRead ''LibraryId
 
 data CrudCommand =
   VideoCommand (CrudSubCommand (Video NoId) VideoId) |
-  FileCommand (CrudSubCommand (VideoFile NoId) VideoFileId) |
-  LibraryCommand (CrudSubCommand (VideoLibrary NoId) VideoLibraryId)
+  FileCommand (CrudSubCommand (File NoId) FileId) |
+  LibraryCommand (CrudSubCommand (Library NoId) LibraryId)
   deriving (Show)
 
 data (Read id) => CrudSubCommand item id =
@@ -84,7 +84,7 @@ getSingleParser typeName = do
 
   pure id
 
-addFileParser :: Parser (VideoFile NoId)
+addFileParser :: Parser (File NoId)
 addFileParser = do
   videoId <- option auto $
     long "video" <>
@@ -106,16 +106,16 @@ addFileParser = do
     metavar "<storage-id>" <>
     help "Id for associated video"
 
-  pure $ VideoFile NoId videoId url libraryId storageId
+  pure $ File NoId videoId url libraryId storageId
 
-addLibraryParser :: Parser (VideoLibrary NoId)
+addLibraryParser :: Parser (Library NoId)
 addLibraryParser = do
   url <- strOption $
     long "url" <>
     metavar "<url>" <>
     help "URL for library"
 
-  pure $ VideoLibrary NoId url
+  pure $ Library NoId url
 
 addVideoParser :: Parser (Video NoId)
 addVideoParser = do
@@ -126,7 +126,7 @@ addVideoParser = do
 
   pure $ Video NoId name
 
-deleteFileParser :: Parser (VideoFileId)
+deleteFileParser :: Parser (FileId)
 deleteFileParser = do
   id <- option auto $
     long "id" <>
