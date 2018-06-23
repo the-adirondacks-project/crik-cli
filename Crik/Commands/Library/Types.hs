@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 
 module Crik.Commands.Library.Types
 (
   LibraryCreateOptions(..)
+, LibraryInfoOptions(..)
 , LibraryListOptions(..)
 , LibrarySubCommand(..)
 , LibraryType(..)
@@ -25,11 +27,20 @@ data LibraryListOptions =
   LibraryListOptions
   deriving (Show)
 
+data LibraryInfoOptions =
+  LibraryInfoOptions {
+    libraryName :: Text --TODO: We want to be able to use id or name
+  }
+  deriving (Show)
+
 data LibrarySubCommand =
   LibraryCreate {
     libraryCreateOptions :: LibraryCreateOptions
   } |
   LibraryList {
     libraryListOptions :: LibraryListOptions
+  } |
+  LibraryInfo {
+    libraryInfoOptions :: LibraryInfoOptions
   }
   deriving (Show)

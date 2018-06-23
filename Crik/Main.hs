@@ -1,3 +1,4 @@
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -51,6 +52,14 @@ handleCommand (LibraryCommand (CL.LibraryList _)) environment = do
               (libraryName <> " - " <> (pack $ show (libraryType library)) <> " - " <> libraryUrl)
            ) libraries
       return ()
+handleCommand (LibraryCommand (CL.LibraryInfo CL.LibraryInfoOptions{..})) environment = do
+  response <- runClientM (getLibraryByName libraryName) environment
+  case response of
+    Left error -> print error
+    Right library@Library{..} -> do
+      T.putStrLn $ "Name: " <> libraryName
+      putStrLn $ "Type: " <> (show (libraryType library))
+      T.putStrLn $ "Location: " <> libraryUrl
 
 -- TODO: Parse location to handle urls better
 getUrlForLibrary :: LibraryType -> Text -> Text

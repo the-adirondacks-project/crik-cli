@@ -12,6 +12,7 @@ module Crik.Client
 , getFiles
 , createFile
 , getLibrary
+, getLibraryByName
 , getLibraries
 , createLibrary
 , updateLibrary
@@ -76,12 +77,14 @@ proxiedLibraryAPI :: Proxy LibraryAPI
 proxiedLibraryAPI = Proxy
 
 getLibrary :: LibraryId -> ClientM (Library LibraryId)
+getLibraryByName :: Text -> ClientM (Library LibraryId)
 getLibraries :: ClientM [Library LibraryId]
 createLibrary :: (Library NoId) -> ClientM (Library LibraryId)
 updateLibrary :: LibraryId -> (Library NoId) -> ClientM (Library LibraryId)
 getNewFilesInLibrary :: LibraryId -> ClientM [Text]
 getAllFilesInLibrary :: LibraryId -> ClientM [Text]
 ( getLibrary :<|>
+  getLibraryByName :<|>
   getLibraries :<|>
   createLibrary :<|>
   updateLibrary :<|>

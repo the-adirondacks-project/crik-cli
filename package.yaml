@@ -30,6 +30,7 @@ executables:
     - Crik.Commands
     - Crik.Commands.Library
     - Crik.Commands.Library.Create
+    - Crik.Commands.Library.Info
     - Crik.Commands.Library.List
     - Crik.Commands.Library.Types
     - Crik.Commands.Types
