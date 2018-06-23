@@ -34,7 +34,7 @@ handleCommand :: Command -> ClientEnv -> IO ()
 handleCommand (CrudCommand crudCommand) environment = handleCrudCommand crudCommand environment
 handleCommand (LibraryCommand (LibraryCreate (LibraryCreateOptions{..}))) environment = do
   let url = getUrlForLibrary libraryType libraryLocation
-  let library = Library NoId url
+  let library = Library NoId url libraryName
   response <- runClientM (createLibrary library) environment
   case response of
     Left error -> print error

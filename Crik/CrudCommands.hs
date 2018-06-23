@@ -115,7 +115,12 @@ addLibraryParser = do
     metavar "<url>" <>
     help "URL for library"
 
-  pure $ Library NoId url
+  name <- strOption $
+    long "name" <>
+    metavar "<name>" <>
+    help "name for library"
+
+  pure $ Library NoId url name
 
 addVideoParser :: Parser (Video NoId)
 addVideoParser = do
