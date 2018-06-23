@@ -2,25 +2,17 @@
 
 module Crik.Commands.Library.Types
 (
-  LibrarySubCommand(..)
-, LibraryCreateOptions(..)
+  LibraryCreateOptions(..)
+, LibraryListOptions(..)
+, LibrarySubCommand(..)
 , LibraryType(..)
 ) where
 
-import Data.String (IsString(..))
 import Data.Text (Text)
 import Text.ParserCombinators.ReadP (look, pfail)
 import GHC.Read (Read, readPrec)
 
-data LibraryType =
-  HTTP |
-  Directory
-  deriving (Show)
-
-instance IsString LibraryType where
-  fromString text = case text of
-    "http" -> HTTP
-    "directory" -> Directory
+import Crik.Types.Library
 
 data LibraryCreateOptions =
   LibraryCreateOptions {
@@ -29,8 +21,15 @@ data LibraryCreateOptions =
     libraryLocation :: Text
   } deriving (Show)
 
+data LibraryListOptions =
+  LibraryListOptions
+  deriving (Show)
+
 data LibrarySubCommand =
   LibraryCreate {
     libraryCreateOptions :: LibraryCreateOptions
+  } |
+  LibraryList {
+    libraryListOptions :: LibraryListOptions
   }
   deriving (Show)

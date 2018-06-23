@@ -2,7 +2,8 @@
 {-# LANGUAGE RecordWildCards #-}
 
 import Data.Aeson (ToJSON, encode)
-import Data.Text (Text)
+import Data.Text (Text, pack)
+import qualified Data.Text.IO as T (putStrLn)
 import qualified Data.ByteString.Lazy as BS (putStr)
 import Data.Semigroup ((<>))
 import Network.HTTP.Client (newManager, defaultManagerSettings)
@@ -13,7 +14,7 @@ import Crik.Client
 import Crik.CrudCommands
 import Crik.Commands
 import Crik.Commands.Types
-import Crik.Commands.Library.Types
+import qualified Crik.Commands.Library.Types as CL
 import Crik.Types
 import Crik.Types.Library
 
@@ -32,16 +33,28 @@ run clientFunction environment = runClientM clientFunction environment >>= handl
 
 handleCommand :: Command -> ClientEnv -> IO ()
 handleCommand (CrudCommand crudCommand) environment = handleCrudCommand crudCommand environment
-handleCommand (LibraryCommand (LibraryCreate (LibraryCreateOptions{..}))) environment = do
+handleCommand (LibraryCommand (CL.LibraryCreate (CL.LibraryCreateOptions{..}))) environment = do
   let url = getUrlForLibrary libraryType libraryLocation
   let library = Library NoId url libraryName
   response <- runClientM (createLibrary library) environment
   case response of
     Left error -> print error
     Right library -> putStrLn "Library created."
+handleCommand (LibraryCommand (CL.LibraryList _)) environment = do
+  response <- runClientM getLibraries environment
+  case response of
+    Left error -> print error
+    Right libraries -> do
+      putStrLn "Name - Type - Location"
+      mapM (\library@Library{..} -> do
+             T.putStrLn
+              (libraryName <> " - " <> (pack $ show (libraryType library)) <> " - " <> libraryUrl)
+           ) libraries
+      return ()
 
+-- TODO: Parse location to handle urls better
 getUrlForLibrary :: LibraryType -> Text -> Text
-getUrlForLibrary HTTP location = location -- TODO: Parse location and add http if it doesn't exist
+getUrlForLibrary HTTP location = "http://" <> location
 getUrlForLibrary Directory location = "file://" <> location
 
 handleCrudCommand :: CrudCommand -> ClientEnv -> IO ()
