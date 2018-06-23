@@ -24,9 +24,9 @@ deriveWrappedRead ''FileStorageId
 deriveWrappedRead ''LibraryId
 
 data CrudCommand =
-  VideoCommand (CrudSubCommand (Video NoId) VideoId) |
-  FileCommand (CrudSubCommand (File NoId) FileId) |
-  LibraryCommand (CrudSubCommand (Library NoId) LibraryId)
+  VideoCrudCommand (CrudSubCommand (Video NoId) VideoId) |
+  FileCrudCommand (CrudSubCommand (File NoId) FileId) |
+  LibraryCrudCommand (CrudSubCommand (Library NoId) LibraryId)
   deriving (Show)
 
 data (Read id) => CrudSubCommand item id =
@@ -40,9 +40,9 @@ data (Read id) => CrudSubCommand item id =
 crudCommandParser :: Parser CrudCommand
 crudCommandParser =
   subparser (
-    (crudCommandParserHelper FileCommand "file" "files" addFileParser deleteFileParser) <>
-    (crudCommandParserHelper LibraryCommand "library" "libraries" addLibraryParser undefined) <>
-    (crudCommandParserHelper VideoCommand "video" "videos" addVideoParser undefined)
+    (crudCommandParserHelper FileCrudCommand "file" "files" addFileParser deleteFileParser) <>
+    (crudCommandParserHelper LibraryCrudCommand "library" "libraries" addLibraryParser undefined) <>
+    (crudCommandParserHelper VideoCrudCommand "video" "videos" addVideoParser undefined)
   )
   where
     crudCommandParserHelper :: (Read id) =>

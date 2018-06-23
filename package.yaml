@@ -27,6 +27,11 @@ executables:
     main: Crik/Main.hs
     other-modules:
     - Crik.Client
+    - Crik.Commands
+    - Crik.Commands.Library
+    - Crik.Commands.Library.Create
+    - Crik.Commands.Library.Types
+    - Crik.Commands.Types
     - Crik.CrudCommands
     - Crik.TH.DeriveWrapped
     ghc-options:
