@@ -1,6 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 import Data.Aeson (ToJSON, encode)
+import Data.Text (Text)
 import qualified Data.ByteString.Lazy as BS (putStr)
 import Data.Semigroup ((<>))
 import Network.HTTP.Client (newManager, defaultManagerSettings)
@@ -9,9 +11,11 @@ import Servant.Client
 
 import Crik.Client
 import Crik.CrudCommands
-
-parser = info (crudCommandParser <**> helper)
-  (fullDesc <> progDesc "A program that does things" <> header "program - a thing")
+import Crik.Commands
+import Crik.Commands.Types
+import Crik.Commands.Library.Types
+import Crik.Types
+import Crik.Types.Library
 
 getAPIEnvironment :: IO (ClientEnv)
 getAPIEnvironment = do
@@ -21,27 +25,41 @@ getAPIEnvironment = do
 main :: IO ()
 main = do
   apiEnvironment <- getAPIEnvironment
-  execParser parser >>= (flip handleCommand) apiEnvironment
+  execParser commandsParser >>= (flip handleCommand) apiEnvironment
 
 run :: ToJSON a => ClientM a -> ClientEnv -> IO ()
 run clientFunction environment = runClientM clientFunction environment >>= handleResponse
 
-handleCommand :: CrudCommand -> ClientEnv -> IO ()
+handleCommand :: Command -> ClientEnv -> IO ()
+handleCommand (CrudCommand crudCommand) environment = handleCrudCommand crudCommand environment
+handleCommand (LibraryCommand (LibraryCreate (LibraryCreateOptions{..}))) environment = do
+  let url = getUrlForLibrary libraryType libraryLocation
+  let library = Library NoId url
+  response <- runClientM (createLibrary library) environment
+  case response of
+    Left error -> print error
+    Right library -> putStrLn "Library created."
+
+getUrlForLibrary :: LibraryType -> Text -> Text
+getUrlForLibrary HTTP location = location -- TODO: Parse location and add http if it doesn't exist
+getUrlForLibrary Directory location = "file://" <> location
+
+handleCrudCommand :: CrudCommand -> ClientEnv -> IO ()
 -- Videos
-handleCommand (VideoCommand (Get id)) = run (getVideo id)
-handleCommand (VideoCommand GetAll) = run getVideos
-handleCommand (VideoCommand (Create video)) = run $ createVideo video
+handleCrudCommand (VideoCrudCommand (Get id)) = run (getVideo id)
+handleCrudCommand (VideoCrudCommand GetAll) = run getVideos
+handleCrudCommand (VideoCrudCommand (Create video)) = run $ createVideo video
 
 -- Files
-handleCommand (FileCommand (Get id)) = run (getFile id)
-handleCommand (FileCommand GetAll) = run getFiles
-handleCommand (FileCommand (Create file)) = run $ createFile file
-handleCommand (FileCommand (Delete id)) = undefined
+handleCrudCommand (FileCrudCommand (Get id)) = run (getFile id)
+handleCrudCommand (FileCrudCommand GetAll) = run getFiles
+handleCrudCommand (FileCrudCommand (Create file)) = run $ createFile file
+handleCrudCommand (FileCrudCommand (Delete id)) = undefined
 
 -- Libraries
-handleCommand (LibraryCommand (Get id)) = run (getLibrary id)
-handleCommand (LibraryCommand GetAll) = run getLibraries
-handleCommand (LibraryCommand (Create library)) = run $ createLibrary library
+handleCrudCommand (LibraryCrudCommand (Get id)) = run (getLibrary id)
+handleCrudCommand (LibraryCrudCommand GetAll) = run getLibraries
+handleCrudCommand (LibraryCrudCommand (Create library)) = run $ createLibrary library
 
 handleResponse :: ToJSON a => Either ServantError a -> IO ()
 handleResponse (Left error) = print error

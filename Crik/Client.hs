@@ -25,6 +25,8 @@ import Servant.API ((:<|>)((:<|>)))
 import Servant.Client (ClientM, client)
 import Web.HttpApiData (ToHttpApiData, toUrlPiece, toQueryParam)
 
+import Network.HTTP.Client (Response(..))
+
 import Crik.API
 import Crik.Types
 import Crik.Types.Video
