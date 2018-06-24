@@ -34,6 +34,8 @@ executables:
     - Crik.Commands.Library.List
     - Crik.Commands.Library.Types
     - Crik.Commands.Types
+    - Crik.Commands.Video.Info
+    - Crik.Commands.Video.Types
     - Crik.CrudCommands
     - Crik.TH.DeriveWrapped
     ghc-options:

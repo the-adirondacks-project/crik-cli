@@ -5,8 +5,10 @@ module Crik.Commands.Types
 
 import Crik.CrudCommands
 import Crik.Commands.Library.Types
+import Crik.Commands.Video.Types
 
 data Command =
   CrudCommand CrudCommand |
-  LibraryCommand LibrarySubCommand
+  LibraryCommand LibrarySubCommand |
+  VideoCommand VideoSubCommand
   deriving (Show)

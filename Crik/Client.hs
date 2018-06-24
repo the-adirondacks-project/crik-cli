@@ -4,6 +4,7 @@
 module Crik.Client
 (
   getVideo
+, getVideoByName
 , getVideos
 , createVideo
 , updateVideo

@@ -16,8 +16,10 @@ import Crik.CrudCommands
 import Crik.Commands
 import Crik.Commands.Types
 import qualified Crik.Commands.Library.Types as CL
+import qualified Crik.Commands.Video.Types as CV
 import Crik.Types
 import Crik.Types.Library
+import Crik.Types.Video
 
 getAPIEnvironment :: IO (ClientEnv)
 getAPIEnvironment = do
@@ -60,6 +62,12 @@ handleCommand (LibraryCommand (CL.LibraryInfo CL.LibraryInfoOptions{..})) enviro
       T.putStrLn $ "Name: " <> libraryName
       putStrLn $ "Type: " <> (show (libraryType library))
       T.putStrLn $ "Location: " <> libraryUrl
+handleCommand (VideoCommand (CV.VideoInfo CV.VideoInfoOptions{..})) environment = do
+  response <- runClientM (getVideoByName videoName) environment
+  case response of
+    Left error -> print error
+    Right video@Video{..} -> do
+      T.putStrLn $ "Name: " <> videoName
 
 -- TODO: Parse location to handle urls better
 getUrlForLibrary :: LibraryType -> Text -> Text
