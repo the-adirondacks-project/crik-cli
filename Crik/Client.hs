@@ -51,11 +51,13 @@ proxiedVideoAPI :: Proxy VideoAPI
 proxiedVideoAPI = Proxy
 
 getVideo :: VideoId -> ClientM (Video VideoId)
+getVideoByName :: Text -> ClientM (Video VideoId)
 getVideos :: ClientM [Video VideoId]
 createVideo :: Video NoId -> ClientM (Video VideoId)
 updateVideo :: VideoId -> (Video (Maybe VideoId)) -> ClientM (Video VideoId)
 getFilesForVideo :: VideoId -> ClientM [File FileId]
 ( getVideo :<|>
+  getVideoByName :<|>
   getVideos :<|>
   createVideo :<|>
   updateVideo :<|>
